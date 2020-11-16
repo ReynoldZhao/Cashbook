@@ -18,8 +18,8 @@ class CategorySelect extends React.Component {
     event.preventDefault();
   };
   render() {
-    const { categories, selectedCategory } = this.props;
-    const selectedCategoryId = selectedCategory && selectedCategory.id;
+    const { categories } = this.props;
+    const selectedCategoryId = this.state
     return (
       <div className="category-select-component">
         <div className="row">
@@ -39,7 +39,7 @@ class CategorySelect extends React.Component {
                 className={activaClassName}
                 key={index}
                 onClick={(event) => {
-                  this.selectedCategory(event, category);
+                  this.selectCategory(event, category);
                 }}
               >
                 <Ionicon
@@ -49,6 +49,7 @@ class CategorySelect extends React.Component {
                   color={iconColor}
                   icon={category.iconName}
                 />
+                <p>{category.name}</p>
               </div>
             );
           })}

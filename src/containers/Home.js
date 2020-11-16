@@ -15,6 +15,8 @@ import MonthPicker from "../components/MonthPicker";
 import TotalPrice from "../components/TotalPrice";
 import CreateBtn from "../components/CreateBtn";
 import { Tabs, Tab } from "../components/Tabs";
+import { AppContext } from "../AppContext";
+import withContext from "../WithContext";
 
 const categories = {
   1: {
@@ -62,7 +64,7 @@ const newItem = {
   cid: 1,
 };
 
-const tabsText = [LIST_VIEW, CHART_VIEW]
+const tabsText = [LIST_VIEW, CHART_VIEW];
 
 class Home extends Component {
   constructor(props) {
@@ -109,6 +111,7 @@ class Home extends Component {
     });
   };
   render() {
+    const { data } = this.props
     const { items, currentDate, tabView } = this.state;
     const itemsWithCategory = items
       .map((item) => {
@@ -185,4 +188,4 @@ class Home extends Component {
   }
 }
 
-export default Home;
+export default withContext(Home);

@@ -5,22 +5,36 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap/dist/js/bootstrap'
 import Home from '../src/containers/Home'
 import Create from '../src/containers/Create'
+import { testItems, testCategories } from './testData'
+import { flattenArray } from "./utility";
+import { AppContext } from "./AppContext"
 
-function App() {
-  return (
-    <Router>
-      <div className="App">
-        <ul>
-          <Link to="/">Home</Link>
-          <Link to="/create">Create</Link>
-          <Link to="/edit/10">Edit</Link>
-        </ul>
-        <Route path="/" exact component={Home} />
-        <Route path="/create" component={Create} />
-        <Route path="/edit/:id" component={Create} />
-      </div>
-    </Router>
-  );
+class App extends Component {
+  constructor(props) {
+    super(props)
+    this.setState = {
+      items: flattenArray(testItems),
+      categories: flattenArray(testCategories)
+    }
+  }
+  render() {
+    return (
+      <AppContext.Provider value={{
+        state: this.state,
+        actions: this.actions,
+      }}>
+      <Router>
+        <div className="App">
+          <div className="container pb-5">
+            <Route path="/" exact component={Home} />
+            <Route path="/create" component={Create} />
+            <Route path="/edit/:id" component={Create} />
+          </div>
+        </div>
+      </Router>
+      </AppContext.Provider>
+    )
+  }
 }
 
 export default App;

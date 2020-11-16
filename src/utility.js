@@ -33,6 +33,13 @@ export const isValidDate = (dateString) => {
     return d.toISOString().slice(0,10) === dateString
 }
 
+export const flattenArray = (arr) => {
+  return arr.reduce((map, item) => {
+    map[item.id] = item
+    return map
+  }, {})
+}
+
 export const Colors = {
   blue: "#347eff",
   deepBlue: "#61dafb",
