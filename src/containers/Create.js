@@ -12,9 +12,12 @@ const tabsText = [TYPE_OUTCOME, TYPE_INCOME]
 class Create extends React.Component {
   constructor(props) {
     super(props);
+    const { id } = props.match.params
+    const { categories, items } = props.data
     this.state = {
-      selectedTab: tabsText[0],
-      selectedCategory: null,
+      selectedTab: (id && items[id]) ? categories[items[id].cid].type : TYPE_OUTCOME,
+      selectedCategory: (id && items[id]) ? categories[items[id].cid] : null,
+      validationPassed: true,
     };
   }
   tabChange = (index) => {
@@ -31,27 +34,37 @@ class Create extends React.Component {
     this.props.history.push("/");
   }
   submitForm = (data, isEditMode) => {
+    if (!this.state.selectedCategory) {
+      this.setState({
+        validationPassed: false
+      })
+      return 
+    }
     if (!isEditMode) {
+      //create
       this.props.actions.createItem(data, this.state.selectedCategory.id)
     } else {
-
+      //update
+      this.props.actions.updateItem(data, this.state.selectedCategory.id)
     }
     this.props.history.push('/')
   }
   render() {
     const { data } = this.props;
     const { items, categories } = data;
+    const { id } = this.props.match.params
+    const editItem = ( id && items[id] ) ? items[id] : {}
     const { selectedTab, selectedCategory } = this.state;
     const filterCategories = Object.keys(categories)
       .filter(id => categories[id].type === selectedTab)
       .map(id => categories[id]);
-    console.log(filterCategories)
+    const tabIndex = tabsText.findIndex(text => text === selectedTab )
     return (
       <div
         className="create-page py-3 px-3 rounded mt-3"
         style={{ background: "#fff" }}
       >
-        <Tabs activeIndex={0} onTabChange={this.tabChange}>
+        <Tabs activeIndex={tabIndex} onTabChange={this.tabChange}>
           <Tab>支出</Tab>
           <Tab>收入</Tab>
         </Tabs>
@@ -60,7 +73,11 @@ class Create extends React.Component {
           onSelectCategory={this.selectCategory}
           selectedCategory={selectedCategory}
         />
-        <PriceForm onFormSubmit={this.submitForm} onCancelSubmit={this.cancelSubmit} />
+        <PriceForm 
+          onFormSubmit={this.submitForm} 
+          onCancelSubmit={this.cancelSubmit} 
+          item={editItem}  
+        />
       </div>
     );
   }

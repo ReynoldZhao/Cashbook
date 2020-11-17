@@ -52,6 +52,7 @@ class Home extends Component {
     const { data } = this.props;
     const { items, categories } = data;
     const { currentDate, tabView } = this.state;
+    const tabIndex = tabsText.findIndex(tabText => tabText === tabView)
     const itemsWithCategory = Object.keys(items)
       .map((id) => {
         items[id].category = categories[items[id].cid];
@@ -91,7 +92,7 @@ class Home extends Component {
           </div>
         </header>
         <div className="content-area py-3 px-3">
-          <Tabs activeIndex={0} onTabChange={this.changeView}>
+          <Tabs activeIndex={tabIndex} onTabChange={this.changeView}>
             <Tab>
               <Ionicon
                 className="rounded-circle mr-2"
@@ -111,7 +112,6 @@ class Home extends Component {
               图表模式
             </Tab>
           </Tabs>
-          <ViewTab activeTab={tabView} onTabChange={this.changeView} />
           <CreateBtn onClick={this.createItem} />
           {tabView === LIST_VIEW && (
             <PriceList
