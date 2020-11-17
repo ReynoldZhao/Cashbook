@@ -17,52 +17,7 @@ import CreateBtn from "../components/CreateBtn";
 import { Tabs, Tab } from "../components/Tabs";
 import { AppContext } from "../AppContext";
 import withContext from "../WithContext";
-
-const categories = {
-  1: {
-    id: "1",
-    name: "旅行",
-    type: "outcome",
-    iconName: "ios-plane",
-  },
-  2: {
-    id: "2",
-    name: "理财",
-    type: "income",
-    iconName: "logo-yen",
-  },
-};
-const items = [
-  {
-    id: 1,
-    title: "去青甘旅游",
-    price: 200,
-    date: "2019-09-10",
-    cid: 1,
-  },
-  {
-    id: 2,
-    title: "去上海旅游",
-    price: 400,
-    date: "2019-09-10",
-    cid: 1,
-  },
-  {
-    id: 3,
-    title: "理财收入",
-    price: 200,
-    date: "2019-10-10",
-    cid: 2,
-  },
-];
-
-const newItem = {
-  id: 34,
-  title: "新添加的项目",
-  price: 300,
-  date: "2019-09-10",
-  cid: 1,
-};
+import { withRouter } from "react-router-dom";
 
 const tabsText = [LIST_VIEW, CHART_VIEW];
 
@@ -70,7 +25,6 @@ class Home extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      items,
       currentDate: parseToYearAndMonth(),
       tabView: tabsText[0],
     };
@@ -85,38 +39,23 @@ class Home extends Component {
       currentDate: { year, month },
     });
   };
-  modifyItem = (modifiedItem) => {
-    const modifiedItems = this.state.items.map((item) => {
-      if (item.id === modifiedItem.id) {
-        return { ...item, title: "更新后的标题" };
-      } else {
-        return item;
-      }
-    });
-    this.setState({
-      items: modifiedItems,
-    });
+  modifyItem = (item) => {
+    this.props.history.push(`/edit/${item.id}`);
   };
   createItem = () => {
-    this.setState({
-      items: [newItem, ...this.state.items],
-    });
+    this.props.history.push("/create");
   };
-  deleteItem = (deletedItem) => {
-    const filteredItems = this.state.items.filter(
-      (item) => item.id !== deletedItem.id
-    );
-    this.setState({
-      items: filteredItems,
-    });
+  deleteItem = (item) => {
+    this.props.actions.deleteItem(item);
   };
   render() {
-    const { data } = this.props
-    const { items, currentDate, tabView } = this.state;
-    const itemsWithCategory = items
-      .map((item) => {
-        item.category = categories[item.cid];
-        return item;
+    const { data } = this.props;
+    const { items, categories } = data;
+    const { currentDate, tabView } = this.state;
+    const itemsWithCategory = Object.keys(items)
+      .map((id) => {
+        items[id].category = categories[items[id].cid];
+        return items[id];
       })
       .filter((item) => {
         return item.date.includes(
@@ -188,4 +127,4 @@ class Home extends Component {
   }
 }
 
-export default withContext(Home);
+export default withRouter(withContext(Home));

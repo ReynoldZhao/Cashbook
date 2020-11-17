@@ -6,15 +6,33 @@ import 'bootstrap/dist/js/bootstrap'
 import Home from '../src/containers/Home'
 import Create from '../src/containers/Create'
 import { testItems, testCategories } from './testData'
-import { flattenArray } from "./utility";
+import { flattenArray, ID, parseToYearAndMonth } from "./utility";
 import { AppContext } from "./AppContext"
 
 class App extends Component {
   constructor(props) {
     super(props)
-    this.setState = {
+    this.state = {
       items: flattenArray(testItems),
       categories: flattenArray(testCategories)
+    }
+    this.actions = {
+      deleteItem: (item) => {
+        delete this.state.items[item.id]
+        this.setState({
+          items: this.state.items
+        })
+      },
+      createItem: (data, categoryId) => {
+        const newId = ID()
+        const parsedDate = parseToYearAndMonth(data.date)
+        data.monthCategory = `${parsedDate.year}-${parsedDate.month}`
+        data.timestamp = new Date(data.date).getTime()
+        const newItem = {...data, id: newId, cid: categoryId }
+        this.setState({
+          items: {...this.state.items, [newId]: newItem}
+        })
+      }
     }
   }
   render() {
