@@ -193,6 +193,60 @@
       "id": "_qmatbbw69",
       "cid": "6",
       "timestamp": 1544400000000
+    },
+    {
+      "title": "吃晚饭",
+      "price": 50,
+      "date": "2020-10-26",
+      "monthCategory": "2020-10",
+      "timestamp": 1603670400000,
+      "id": "_rqyozgts7",
+      "cid": "2"
+    },
+    {
+      "title": "青甘",
+      "price": 6000,
+      "date": "2020-11-01",
+      "monthCategory": "2020-11",
+      "timestamp": 1604188800000,
+      "id": "_uvuw7mabq",
+      "cid": "1"
+    },
+    {
+      "title": "日杂",
+      "price": 60,
+      "date": "2020-11-27",
+      "monthCategory": "2020-11",
+      "timestamp": 1606435200000,
+      "id": "_d9i6dtcx0",
+      "cid": "3"
+    },
+    {
+      "title": "问题在哪",
+      "price": 1,
+      "date": "2020-11-01",
+      "monthCategory": "2020-11",
+      "timestamp": 1604188800000,
+      "id": "_w7cdjfudz",
+      "cid": "3"
+    },
+    {
+      "title": "测试购物",
+      "price": 1111,
+      "date": "2020-11-02",
+      "monthCategory": "2020-11",
+      "timestamp": 1604275200000,
+      "id": "_1r6agy64p",
+      "cid": "3"
+    },
+    {
+      "title": "测试买车",
+      "price": 15000,
+      "date": "2020-11-21",
+      "monthCategory": "2020-11",
+      "timestamp": 1605916800000,
+      "id": "_0hhvb74a1",
+      "cid": "7"
     }
   ]
 }

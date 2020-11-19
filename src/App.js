@@ -18,11 +18,16 @@ class App extends Component {
       isLoading: false,
       currentDate: parseToYearAndMonth(),
     };
-    this.actions = {
-      getInitialData: async () => {
+    const withLoading = (cb) => {
+      return (...args) => {
         this.setState({
-          isLoading: true,
-        });
+          isLoading: true
+        })
+        return cb(...args)
+      }
+    }
+    this.actions = {
+      getInitialData: withLoading(async () => {
         const { currentDate } = this.state;
         const getURLWithData = `/items?monthCategory=${currentDate.year}-${currentDate.month}&_sort=timestamp&_order=desc`;
         const results = await Promise.all([
@@ -35,42 +40,83 @@ class App extends Component {
           categories: flattenArray(categories.data),
           isLoading: false,
         });
-      },
-      selectNewMonth: async (year, month) => {
+        return { items, categories }
+      }),
+      getEditData: withLoading(async (id) => {
+        const { items, categories } = this.state
+        let promiseArr = []
+        if (Object.keys(categories).length === 0) {
+          promiseArr.push(axios.get('/categories'))
+        }
+        const itemAlreadyFetched = !!(Object.keys(items).indexOf(id) > -1)
+        if ( id && !itemAlreadyFetched ) {
+          const getURLWithID = `/items/${id}`
+          promiseArr.push(axios.get(getURLWithID))
+        }
+        const [ fetchedCategories, editItem ] = await Promise.all(promiseArr)
+        const finalCategories = fetchedCategories ? flattenArray(fetchedCategories.data) : categories
+        const finalItem = editItem ? editItem.data : items[id]
+        if (id) {
+          this.setState({
+            categories: finalCategories,
+            isLoading: false,
+            items: { ...this.state.items, [id]: finalItem}
+          })
+        } else {
+          this.setState({
+            categories: finalCategories,
+            isLoading: false,
+          })
+        }
+        return {
+          categories: finalCategories,
+          editItem: finalItem,
+        }
+      }),
+      selectNewMonth: withLoading(async (year, month) => {
         const getURLWithData = `/items?monthCategory=${year}-${month}&_sort=timestamp&_order=desc`;
         const items = await axios.get(getURLWithData);
         this.setState({
           items: flattenArray(items.data),
           currentDate: { year, month },
+          isLoading: false,
         });
-      },
-      deleteItem: async (item) => {
+        return items
+      }),
+      deleteItem: withLoading(async (item) => {
         const deleteItems = await axios.delete(`/items/${item.id}`);
         delete this.state.items[item.id];
         this.setState({
           items: this.state.items,
+          isLoading: false,
         });
-      },
-      createItem: (data, categoryId) => {
+        return deleteItems
+      }),
+      createItem: withLoading(async (data, categoryId) => {
         const newId = ID();
         const parsedDate = parseToYearAndMonth(data.date);
         data.monthCategory = `${parsedDate.year}-${parsedDate.month}`;
         data.timestamp = new Date(data.date).getTime();
-        const newItem = { ...data, id: newId, cid: categoryId };
+        const newItem = await axios.post('/items', { ...data, id: newId, cid: categoryId })
         this.setState({
-          items: { ...this.state.items, [newId]: newItem },
+          items: { ...this.state.items, [newId]: newItem.data },
+          isLoading: false
         });
-      },
-      updateItem: (item, updatedCategoryId) => {
-        const modifiedItem = {
+        return newItem.data
+      }),
+      updateItem: withLoading(async(item, updatedCategoryId) => {
+        const updatedData = {
           ...item,
           cid: updatedCategoryId,
           timestamp: new Date(item.date).getTime(),
         };
+        const modifiedItem = await axios.put(`/items/${item.id}`, updatedData)
         this.setState({
           items: { ...this.state.items, [modifiedItem.id]: modifiedItem },
+          isLoading: false
         });
-      },
+        return modifiedItem.data
+      }),
     };
   }
   render() {
