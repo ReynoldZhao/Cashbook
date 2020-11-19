@@ -9,6 +9,7 @@ import {
   TYPE_INCOME,
   TYPE_OUTCOME,
   parseToYearAndMonth,
+  Colors,
 } from "../utility";
 import MonthPicker from "../components/MonthPicker";
 import TotalPrice from "../components/TotalPrice";
@@ -18,8 +19,27 @@ import { AppContext } from "../AppContext";
 import withContext from "../WithContext";
 import { withRouter } from "react-router-dom";
 import Loader from "../components/Loader";
+import PieChart from "../components/PieChart";
 
 const tabsText = [LIST_VIEW, CHART_VIEW];
+
+const generateChartDataByCategory = (items, type = TYPE_INCOME) => {
+  let categoryMap = { }
+  items.filter(item => item.category.type === type).forEach(item => {
+    if (categoryMap[item.cid]) {
+      categoryMap[item.cid].value += (item.price * 1)
+      categoryMap[item.cid].items = [...categoryMap[item.cid].items, item.id]
+    } else {
+      categoryMap[item.cid] = {
+        name: item.category,
+        value: item.price * 1,
+        items: [item.id]
+      }
+    }
+  })
+  return Object.keys(categoryMap).map(mapKey => ({...categoryMap[mapKey]})
+  )
+}
 
 class Home extends Component {
   constructor(props) {
@@ -66,6 +86,8 @@ class Home extends Component {
         totalIncome += item.price;
       }
     });
+    const chartOutcomDataByCategory = generateChartDataByCategory(itemsWithCategory, TYPE_OUTCOME)
+    const chartIncomeDataByCategory = generateChartDataByCategory(itemsWithCategory, TYPE_INCOME)
     return (
       <React.Fragment>
         <header className="App-header">
@@ -118,7 +140,17 @@ class Home extends Component {
                   onDeleteItem={this.deleteItem}
                 />
               )}
-              {tabView === CHART_VIEW && <h1>图表模式</h1>}
+              { tabView === LIST_VIEW && itemsWithCategory.length === 0 &&
+              <div className="alert alert-light text-center no-record">
+                您还没有任何记账记录
+              </div>
+              }
+              {tabView === CHART_VIEW && 
+                <React.Fragment>
+                  <PieChart title="本月支出" categoryData={chartOutcomDataByCategory} />
+                  <PieChart title="本月收入" categoryData={chartIncomeDataByCategory} />
+                </React.Fragment>
+              }
             </React.Fragment>
           )}
         </div>
